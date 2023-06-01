@@ -1,0 +1,10 @@
+@import "./variables/variables.scss";
+
+.main {
+  width: 100px;
+  background-color: $blackColor;
+}
+
+.main div {
+  color: $whiteColor;
+}
