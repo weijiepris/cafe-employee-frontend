@@ -22,13 +22,13 @@ import AddCafe from "./AddCafe";
 import ShowImage from "../common/ShowImage";
 import CafeService from "./services/cafe.service";
 import CONSTANTS from "../common/constants/actions";
-const Cafe = () => {
-  const [editMode, setEditMode] = useState(false);
-  const [editData, setEditData] = useState([]);
-  const [deleteData, setDeleteData] = useState({});
-  const [addMode, setAddMode] = useState(false);
 
+const Cafe = () => {
+  const [addMode, setAddMode] = useState(false);
+  const [deleteData, setDeleteData] = useState({});
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [editData, setEditData] = useState([]);
+  const [editMode, setEditMode] = useState(false);
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
 
@@ -39,8 +39,8 @@ const Cafe = () => {
   // to get url params
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const nameParams = params.get("name");
   const locationParams = params.get("location");
+  const nameParams = params.get("name");
 
   useEffect(() => {
     console.log("name:", nameParams, " location:", locationParams);
@@ -78,15 +78,15 @@ const Cafe = () => {
     }
   }, []);
 
-  const GetCafeByName = useCallback((nameParams) => {
-    CafeService.fetchCafeByCafeName(nameParams).then((res) => {
+  const GetCafeByLocation = useCallback((locationParams) => {
+    CafeService.fetchCafeByLocation(locationParams).then((res) => {
       console.log(res.data);
       dispatch(cafeActions.add(res.data));
     });
   });
 
-  const GetCafeByLocation = useCallback((locationParams) => {
-    CafeService.fetchCafeByLocation(locationParams).then((res) => {
+  const GetCafeByName = useCallback((nameParams) => {
+    CafeService.fetchCafeByCafeName(nameParams).then((res) => {
       console.log(res.data);
       dispatch(cafeActions.add(res.data));
     });
@@ -101,11 +101,11 @@ const Cafe = () => {
     });
   }, []);
 
-  const addNewCafe = () => {
+  const addNewCafe = useCallback(() => {
     setAddMode(true);
-  };
+  }, []);
 
-  const returnToCafe = (getAllData) => {
+  const returnToCafe = useCallback((getAllData) => {
     setEditData([]);
     setEditMode(false);
     setAddMode(false);
@@ -113,29 +113,29 @@ const Cafe = () => {
     if (getAllData) {
       GetCafe(true);
     }
-  };
+  }, []);
 
-  const editRow = (value) => {
+  const editRow = useCallback((value) => {
     setEditData(value.data);
     setEditMode(true);
-  };
+  }, []);
 
-  const deleteRow = (value) => {
+  const deleteRow = useCallback((value) => {
     console.log(value.data);
     setDeleteData(value.data);
     openDialog();
-  };
+  }, []);
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     setDeleteData({});
     setDisplayDialog(false);
-  };
+  }, []);
 
-  const openDialog = () => {
+  const openDialog = useCallback(() => {
     setDisplayDialog(true);
-  };
+  }, []);
 
-  const openEmployee = (event) => {
+  const openEmployee = useCallback((event) => {
     const { employees, name, location } = event.data;
     if (employees <= 0) {
       setShowSnack(true);
@@ -144,9 +144,9 @@ const Cafe = () => {
     }
     navigate(`/employee?name=${name}&location=${location}`);
     return;
-  };
+  }, []);
 
-  const openEmployeeByName = (event) => {
+  const openEmployeeByName = useCallback((event) => {
     const { employees, name, location } = event.data;
     if (employees <= 0) {
       setShowSnack(true);
@@ -155,9 +155,9 @@ const Cafe = () => {
     }
     navigate(`/employee?name=${name}`);
     return;
-  };
+  }, []);
 
-  const openEmployeeByLocation = (event) => {
+  const openEmployeeByLocation = useCallback((event) => {
     const { employees, name, location } = event.data;
     if (employees <= 0) {
       setShowSnack(true);
@@ -166,7 +166,7 @@ const Cafe = () => {
     }
     navigate(`/employee?location=${location}`);
     return;
-  };
+  }, []);
 
   const EditButtonComponent = (value) =>
     useMemo(() => {
@@ -193,40 +193,43 @@ const Cafe = () => {
       return <ShowImage blobImage={value.data.logo} />;
     }, []);
 
-  const columns = [
-    {
-      headerName: "UUID",
-      field: "id",
-    },
-    {
-      headerName: "Name",
-      field: "name",
-      onCellClicked: (event) => {
-        openEmployeeByName(event);
+  const columns = useMemo(
+    () => [
+      {
+        headerName: "UUID",
+        field: "id",
       },
-    },
-    { headerName: "Description", field: "description" },
-    { headerName: "Logo", field: "logo", cellRenderer: ImageComponent },
-    {
-      headerName: "Location",
-      field: "location",
-      onCellClicked: (event) => {
-        openEmployeeByLocation(event);
+      {
+        headerName: "Name",
+        field: "name",
+        onCellClicked: (event) => {
+          openEmployeeByName(event);
+        },
       },
-    },
-    {
-      headerName: "Number of Employees",
-      field: "employees",
-      onCellClicked: (event) => {
-        openEmployee(event);
+      { headerName: "Description", field: "description" },
+      { headerName: "Logo", field: "logo", cellRenderer: ImageComponent },
+      {
+        headerName: "Location",
+        field: "location",
+        onCellClicked: (event) => {
+          openEmployeeByLocation(event);
+        },
       },
-    },
-    {
-      headerName: "Actions",
-      field: "actions",
-      cellRenderer: EditButtonComponent,
-    },
-  ];
+      {
+        headerName: "Number of Employees",
+        field: "employees",
+        onCellClicked: (event) => {
+          openEmployee(event);
+        },
+      },
+      {
+        headerName: "Actions",
+        field: "actions",
+        cellRenderer: EditButtonComponent,
+      },
+    ],
+    []
+  );
 
   if (addMode) {
     return <AddCafe returnToCafe={returnToCafe} action={CONSTANTS.CREATE} />;

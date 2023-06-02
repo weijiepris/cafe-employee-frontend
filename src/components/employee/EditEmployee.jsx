@@ -1,34 +1,28 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  Snackbar,
-  Alert,
+  DialogContent,
+  DialogTitle,
   InputLabel,
   MenuItem,
   Select,
+  Snackbar,
 } from "@mui/material";
 
-import styles from "./styles/Employee.module.css";
+import CafeService from "../cafe/services/cafe.service";
 import Card from "../common/Card";
-import Header from "../common/Header";
 import Form from "../common/Form";
+import Header from "../common/Header";
+import InitCap from "../common/utilities/InitCap";
 import TextBox from "../common/TextBox";
+import { useDispatch } from "react-redux";
 import { validateInputForEmployeeCreation } from "../common/utilities/validation";
 import CONSTANTS from "../common/constants/actions";
 import EmployeeService from "./services/employee.service";
-import { useDispatch } from "react-redux";
-import CafeService from "../cafe/services/cafe.service";
-import InitCap from "../common/utilities/InitCap";
+import styles from "./styles/Employee.module.css";
 
 const EditEmployee = ({ editData, returnToEmployee, action }) => {
   const [showSnack, setShowSnack] = useState(false);
@@ -48,10 +42,6 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
   const genderRef = useRef();
   const cafeNameRef = useRef();
   const locationRef = useRef();
-
-  const closeDialog = () => {
-    setDisplayDialog(false);
-  };
 
   useEffect(() => {
     GetAllCafe();
@@ -99,6 +89,48 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
 
     setCafes([...cafeList]);
   }, []);
+
+  const closeDialog = () => {
+    setDisplayDialog(false);
+  };
+
+  const handleCafeChange = (event) => {
+    setCafeValue(event.target.value);
+  };
+
+  const handleLocationChange = (event) => {
+    setLocationValue(event.target.value);
+  };
+
+  const softReturn = () => {
+    const name = nameRef.current.value;
+    const email = emailRef.current.value;
+    const phoneNumber = phoneNumberRef.current.value;
+    const cafeName = cafeValue;
+    const location = locationValue;
+
+    let tempCafeName = cafeName;
+    let tempLocation = location;
+
+    if (tempLocation === "") {
+      tempLocation = null;
+    }
+    if (tempCafeName === "") {
+      tempCafeName = null;
+    }
+    if (
+      action === CONSTANTS.UPDATE &&
+      (name.toLowerCase() !== editData.name.toLowerCase() ||
+        email.toLowerCase() !== editData.email_address.toLowerCase() ||
+        Number(phoneNumber) !== editData.phone_number ||
+        tempCafeName.toLowerCase() !== editData.cafe_name.toLowerCase() ||
+        tempLocation.toLowerCase() !== editData.location.toLowerCase())
+    ) {
+      setDisplayDialog(true);
+    } else {
+      returnToEmployee();
+    }
+  };
 
   const update = () => {
     const name = nameRef.current.value;
@@ -194,44 +226,6 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
         setSnackMessage(err.response.data);
       });
   }, []);
-
-  const softReturn = () => {
-    const name = nameRef.current.value;
-    const email = emailRef.current.value;
-    const phoneNumber = phoneNumberRef.current.value;
-    const cafeName = cafeValue;
-    const location = locationValue;
-
-    let tempCafeName = cafeName;
-    let tempLocation = location;
-
-    if (tempLocation === "") {
-      tempLocation = null;
-    }
-    if (tempCafeName === "") {
-      tempCafeName = null;
-    }
-    if (
-      action === CONSTANTS.UPDATE &&
-      (name.toLowerCase() !== editData.name.toLowerCase() ||
-        email.toLowerCase() !== editData.email_address.toLowerCase() ||
-        Number(phoneNumber) !== editData.phone_number ||
-        tempCafeName.toLowerCase() !== editData.cafe_name.toLowerCase() ||
-        tempLocation.toLowerCase() !== editData.location.toLowerCase())
-    ) {
-      setDisplayDialog(true);
-    } else {
-      returnToEmployee();
-    }
-  };
-
-  const handleCafeChange = (event) => {
-    setCafeValue(event.target.value);
-  };
-
-  const handleLocationChange = (event) => {
-    setLocationValue(event.target.value);
-  };
 
   return (
     <>

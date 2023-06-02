@@ -15,54 +15,45 @@ import {
 import EditEmployee from "./EditEmployee";
 import { useLocation, useNavigate } from "react-router-dom";
 import EmployeeService from "./services/employee.service";
-
 import Card from "../common/Card";
-
 import styles from "./styles/Employee.module.css";
 import Header from "../common/Header";
 import AddEmployee from "./AddEmployee";
 import CONSTANTS from "../common/constants/actions";
+
 const Employee = () => {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState([]);
   const [addMode, setAddMode] = useState(false);
-
   const [deleteData, setDeleteData] = useState({});
   const [displayDialog, setDisplayDialog] = useState(false);
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
-
-  // to get url params
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const nameParams = params.get("name");
   const locationParams = params.get("location");
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const employee = useSelector((state) => state.employee.data);
 
   useEffect(() => {
     console.log("name:", nameParams, " location:", locationParams);
-
     if (nameParams && locationParams) {
       console.log("here, find by name and location only");
       GetEmployeeByNameAndLocation();
       return;
     }
-
     if (nameParams && !locationParams) {
       console.log("here, find by name only");
       GetAllEmployeesByCafeName();
       return;
     }
-
     if (!nameParams && locationParams) {
       console.log("here, find by location only");
       GetAllEmployeesByCafeLocation();
       return;
     }
-
     GetEmployee();
   }, []);
 
@@ -80,7 +71,6 @@ const Employee = () => {
     setEditData([]);
     setEditMode(false);
     setAddMode(false);
-
     if (getAllData) {
       GetEmployee(true);
     }
@@ -121,43 +111,46 @@ const Employee = () => {
       );
     }, []);
 
-  const columns = [
-    {
-      headerName: "UUID",
-      field: "id",
-    },
-    { headerName: "Name", field: "name" },
-    { headerName: "Email", field: "email_address" },
-    { headerName: "Phone Number", field: "phone_number" },
-    { headerName: "Gender", field: "gender" },
-    { headerName: "Days Worked", field: "days_worked" },
-    {
-      headerName: "Cafe Name",
-      field: "cafe_name",
-      onCellClicked: (event) => {
-        openCafeByCafeName(event);
+  const columns = useMemo(
+    () => [
+      {
+        headerName: "UUID",
+        field: "id",
       },
-    },
-    {
-      headerName: "Cafe Location",
-      field: "location",
-      onCellClicked: (event) => {
-        openCafeByLocation(event);
+      { headerName: "Name", field: "name" },
+      { headerName: "Email", field: "email_address" },
+      { headerName: "Phone Number", field: "phone_number" },
+      { headerName: "Gender", field: "gender" },
+      { headerName: "Days Worked", field: "days_worked" },
+      {
+        headerName: "Cafe Name",
+        field: "cafe_name",
+        onCellClicked: (event) => {
+          openCafeByCafeName(event);
+        },
       },
-    },
-    {
-      headerName: "Actions",
-      field: "actions",
-      cellRenderer: EditButtonComponent,
-    },
-  ];
+      {
+        headerName: "Cafe Location",
+        field: "location",
+        onCellClicked: (event) => {
+          openCafeByLocation(event);
+        },
+      },
+      {
+        headerName: "Actions",
+        field: "actions",
+        cellRenderer: EditButtonComponent,
+      },
+    ],
+    []
+  );
 
   const DeleteEmployee = useCallback((id) => {
     EmployeeService.deleteEmployeeById(id)
       .then((res) => {
         closeDialog();
         setShowSnack(true);
-        setSnackMessage("Succesfully deleted Employee");
+        setSnackMessage("Successfully deleted Employee");
         GetEmployee(true);
       })
       .then(() => console.log("deleted"));
@@ -168,10 +161,9 @@ const Employee = () => {
       console.log(res.data);
       dispatch(employeeActions.add(res.data));
     });
-
     if (!stopEmitToast) {
       setShowSnack(true);
-      setSnackMessage("Succesfully fetched Employee information");
+      setSnackMessage("Successfully fetched Employee information");
     }
   });
 
@@ -259,7 +251,7 @@ const Employee = () => {
       </Button>
 
       <Dialog open={displayDialog} onClose={closeDialog}>
-        <DialogTitle>{"You are about to delete a Employee"}</DialogTitle>
+        <DialogTitle>{"You are about to delete an Employee"}</DialogTitle>
         <DialogContent>
           Are you sure you want to delete this Employee? {deleteData.name}
         </DialogContent>

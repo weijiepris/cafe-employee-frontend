@@ -1,26 +1,26 @@
 import React, {
-  useState,
-  useRef,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
+  Alert,
   Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  Snackbar,
-  Alert,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormLabel,
-  Select,
-  MenuItem,
-  InputLabel,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  FormControlLabel,
+  FormLabel,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Snackbar,
 } from "@mui/material";
 
 import styles from "./styles/Employee.module.css";
@@ -41,7 +41,6 @@ const AddEmployee = ({ returnToEmployee, action }) => {
   const [radioValue, setRadioValue] = useState("M");
   const [cafeValue, setCafeValue] = useState("");
   const [locationValue, setLocationValue] = useState("");
-
   const [cafes, setCafes] = useState([]);
   const [locations, setLocations] = useState([]);
 
@@ -286,7 +285,7 @@ const AddEmployee = ({ returnToEmployee, action }) => {
 
       <Dialog open={displayDialog} onClose={closeDialog}>
         <DialogTitle>{"There are some unsaved changes"}</DialogTitle>
-        <DialogContent>Do you wish continue?</DialogContent>
+        <DialogContent>Do you wish to continue?</DialogContent>
         <DialogActions>
           <Button onClick={() => closeDialog()}>Disagree</Button>
           <Button onClick={() => confirmDialog()}>Agree</Button>

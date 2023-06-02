@@ -1,40 +1,60 @@
-import React, { useState, useRef, useCallback } from "react";
-
+import React, { useCallback, useRef, useState } from "react";
 import {
+  Alert,
   Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   Snackbar,
-  Alert,
 } from "@mui/material";
-
 import styles from "./styles/Cafe.module.css";
 import Card from "../common/Card";
-import Header from "../common/Header";
+import CafeService from "./services/cafe.service";
+import CONSTANTS from "../common/constants/actions";
 import Form from "../common/Form";
+import Header from "../common/Header";
 import TextBox from "../common/TextBox";
 import { validateInputForCafeCreation } from "../common/utilities/validation";
-import CONSTANTS from "../common/constants/actions";
-import CafeService from "./services/cafe.service";
 
-const AddCafe = ({ returnToCafe, action }) => {
-  const [showSnack, setShowSnack] = useState(false);
-  const [snackMessage, setSnackMessage] = useState("");
+const AddCafe = ({ action, returnToCafe }) => {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showSnack, setShowSnack] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
 
   const nameRef = useRef();
   const descriptionRef = useRef();
   const locationRef = useRef();
   const logoRef = useRef();
 
-  const create = () => {
+  const closeDialog = useCallback(() => {
+    setDisplayDialog(false);
+  }, []);
+
+  const confirmDialog = useCallback(() => {
+    setDisplayDialog(false);
+    returnToCafe();
+  }, [returnToCafe]);
+
+  const CreateCafe = useCallback(
+    (formData) => {
+      CafeService.createCafe(formData)
+        .then((res) => {
+          returnToCafe(true);
+        })
+        .catch((err) => {
+          setShowSnack(true);
+          setSnackMessage(err.response.data);
+        });
+    },
+    [returnToCafe]
+  );
+
+  const create = useCallback(() => {
     const name = nameRef.current.value;
     const description = descriptionRef.current.value;
     const location = locationRef.current.value;
-    // const logo = logoRef.current.value;
 
     validateInputForCafeCreation(name, description, location, selectedImage)
       .then(() => {
@@ -59,41 +79,23 @@ const AddCafe = ({ returnToCafe, action }) => {
         formData.append("location", location);
 
         CreateCafe(formData);
-        return;
       })
       .catch((err) => {
         if (err.input === "name") {
           nameRef.current.focus();
           setSnackMessage(err.message);
-        }
-        if (err.input === "description") {
+        } else if (err.input === "description") {
           descriptionRef.current.focus();
           setSnackMessage(err.message);
-        }
-        if (err.input === "location") {
+        } else if (err.input === "location") {
           locationRef.current.focus();
           setSnackMessage(err.message);
         }
-        // if (err.input === "logo") {
-        //   logoRef.current.focus();
-        //   setSnackMessage(err.message);
-        // }
         setShowSnack(true);
       });
-  };
+  }, [selectedImage]);
 
-  const CreateCafe = useCallback((formData) => {
-    CafeService.createCafe(formData)
-      .then((res) => {
-        returnToCafe(true);
-      })
-      .catch((err) => {
-        setShowSnack(true);
-        setSnackMessage(err.response.data);
-      });
-  }, []);
-
-  const handleImageChange = (event) => {
+  const handleImageChange = useCallback((event) => {
     const file = event.target.files[0];
 
     if (file) {
@@ -120,9 +122,9 @@ const AddCafe = ({ returnToCafe, action }) => {
     } else {
       setSelectedImage(null);
     }
-  };
+  }, []);
 
-  const softReturn = () => {
+  const softReturn = useCallback(() => {
     const name = nameRef.current.value;
     const description = descriptionRef.current.value;
     const location = locationRef.current.value;
@@ -132,16 +134,7 @@ const AddCafe = ({ returnToCafe, action }) => {
     } else {
       returnToCafe();
     }
-  };
-
-  const closeDialog = () => {
-    setDisplayDialog(false);
-  };
-
-  const confirmDialog = () => {
-    setDisplayDialog(false);
-    returnToCafe();
-  };
+  }, [action, returnToCafe]);
 
   return (
     <>
@@ -173,20 +166,20 @@ const AddCafe = ({ returnToCafe, action }) => {
         </Form>
         <br />
         <br />
-        <Button className={styles.returnButton} onClick={() => softReturn()}>
-          Go back
-        </Button>
-        <Button className={styles.returnButton} onClick={() => create()}>
+        <Button className={styles.returnButton} onClick={create}>
           Create Cafe
+        </Button>
+        <Button className={styles.returnButton} onClick={softReturn}>
+          Go back
         </Button>
       </Card>
 
       <Dialog open={displayDialog} onClose={closeDialog}>
         <DialogTitle>{"There are some unsaved changes"}</DialogTitle>
-        <DialogContent>Do you wish continue?</DialogContent>
+        <DialogContent>Do you wish to continue?</DialogContent>
         <DialogActions>
-          <Button onClick={() => closeDialog()}>Disagree</Button>
-          <Button onClick={() => confirmDialog()}>Agree</Button>
+          <Button onClick={closeDialog}>Disagree</Button>
+          <Button onClick={confirmDialog}>Agree</Button>
         </DialogActions>
       </Dialog>
 

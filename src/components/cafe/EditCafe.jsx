@@ -1,37 +1,46 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
+  Alert,
   Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   Snackbar,
-  Alert,
 } from "@mui/material";
 import styles from "./styles/Cafe.module.css";
 import Card from "../common/Card";
-import Header from "../common/Header";
 import Form from "../common/Form";
+import Header from "../common/Header";
 import TextBox from "../common/TextBox";
 import { validateInputForCafeCreation } from "../common/utilities/validation";
-import CONSTANTS from "../common/constants/actions";
 import CafeService from "./services/cafe.service";
+import CONSTANTS from "../common/constants/actions";
 
 const EditCafe = ({ editData, returnToCafe, action }) => {
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const [displayDialog, setDisplayDialog] = useState(false);
 
-  const nameRef = useRef();
   const descriptionRef = useRef();
   const locationRef = useRef();
   const logoRef = useRef();
+  const nameRef = useRef();
+
+  const closeDialog = () => {
+    setDisplayDialog(false);
+  };
+
+  const confirmDialog = () => {
+    setDisplayDialog(false);
+    returnToCafe();
+  };
 
   const editCafe = () => {
     const name = nameRef.current.value;
     const location = locationRef.current.value;
     const description = descriptionRef.current.value;
-    // check for difference
+
     if (
       name === editData.name &&
       location === editData.location &&
@@ -46,45 +55,30 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
       .then(() => {
         const cafeObject = {
           id: editData.id,
-          name: name,
-          location: location,
-          description: description,
+          name,
+          location,
+          description,
         };
 
-        UpdateCafe(cafeObject);
-        return;
+        updateCafe(cafeObject);
       })
       .catch((err) => {
         if (err.input === "name") {
           nameRef.current.focus();
-          setSnackMessage(err.message);
         }
         if (err.input === "description") {
           descriptionRef.current.focus();
-          setSnackMessage(err.message);
         }
         if (err.input === "location") {
           locationRef.current.focus();
-          setSnackMessage(err.message);
         }
         if (err.input === "logo") {
           logoRef.current.focus();
-          setSnackMessage(err.message);
         }
+        setSnackMessage(err.message);
         setShowSnack(true);
       });
   };
-
-  const UpdateCafe = useCallback((cafeObject) => {
-    CafeService.updateCafe(cafeObject)
-      .then((res) => {
-        returnToCafe(true);
-      })
-      .catch((err) => {
-        setShowSnack(true);
-        setSnackMessage(err.response.data);
-      });
-  }, []);
 
   const softReturn = () => {
     const name = nameRef.current.value;
@@ -103,14 +97,20 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
     }
   };
 
-  const closeDialog = () => {
-    setDisplayDialog(false);
-  };
+  const updateCafe = useCallback(
+    (cafeObject) => {
+      CafeService.updateCafe(cafeObject)
+        .then(() => {
+          returnToCafe(true);
+        })
+        .catch((err) => {
+          setSnackMessage(err.response.data);
+          setShowSnack(true);
+        });
+    },
+    [returnToCafe]
+  );
 
-  const confirmDialog = () => {
-    setDisplayDialog(false);
-    returnToCafe();
-  };
   return (
     <>
       <Card>
