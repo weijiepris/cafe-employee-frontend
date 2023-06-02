@@ -1,29 +1,27 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { cafeActions } from "../../redux/cafeReducer";
 import {
   Stack,
   Button,
-  Typography,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Snackbar,
   Alert,
-  Container,
-  Box,
-  Divider,
 } from "@mui/material";
-import axios from "axios";
 import Table from "../common/Table";
 import EditCafe from "./EditCafe";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import styles from "./styles/Cafe.module.css";
 import Card from "../common/Card";
 import Header from "../common/Header";
 import AddCafe from "./AddCafe";
+import ShowImage from "../common/ShowImage";
+import CafeService from "./services/cafe.service";
+import CONSTANTS from "../common/constants/actions";
 const Cafe = () => {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState([]);
@@ -38,27 +36,83 @@ const Cafe = () => {
   const dispatch = useDispatch();
   const cafe = useSelector((state) => state.cafe.data);
 
+  // to get url params
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const nameParams = params.get("name");
+  const locationParams = params.get("location");
+
   useEffect(() => {
-    fetchCafe();
+    console.log("name:", nameParams, " location:", locationParams);
+
+    if (nameParams && locationParams) {
+      console.log("here, find by name and location only");
+      // GetCafeByNameAndLocation();
+      return;
+    }
+
+    if (nameParams && !locationParams) {
+      console.log("here, find by name only");
+      GetCafeByName(nameParams);
+      return;
+    }
+
+    if (!nameParams && locationParams) {
+      console.log("here, find by location only");
+      GetCafeByLocation(locationParams);
+      return;
+    }
+
+    // GetEmployee();
+    GetCafe();
   }, []);
 
-  const fetchCafe = () => {
-    axios.get("http://localhost:3001/cafes").then((res) => {
+  const GetCafe = useCallback((stopEmitToast) => {
+    CafeService.fetchCafe().then((res) => {
       console.log(res.data);
       dispatch(cafeActions.add(res.data));
     });
+    if (!stopEmitToast) {
+      setShowSnack(true);
+      setSnackMessage("Succesfully fetched cafe information");
+    }
+  }, []);
 
-    setShowSnack(true);
-    setSnackMessage("Succesfully fetched Cafe information");
-  };
+  const GetCafeByName = useCallback((nameParams) => {
+    CafeService.fetchCafeByCafeName(nameParams).then((res) => {
+      console.log(res.data);
+      dispatch(cafeActions.add(res.data));
+    });
+  });
+
+  const GetCafeByLocation = useCallback((locationParams) => {
+    CafeService.fetchCafeByLocation(locationParams).then((res) => {
+      console.log(res.data);
+      dispatch(cafeActions.add(res.data));
+    });
+  });
+
+  const DeleteCafe = useCallback((id) => {
+    CafeService.deleteCafeById(id).then((res) => {
+      closeDialog();
+      setShowSnack(true);
+      setSnackMessage("Succesfully deleted Cafe");
+      GetCafe(true);
+    });
+  }, []);
 
   const addNewCafe = () => {
     setAddMode(true);
   };
-  const returnToCafe = () => {
+
+  const returnToCafe = (getAllData) => {
     setEditData([]);
     setEditMode(false);
     setAddMode(false);
+
+    if (getAllData) {
+      GetCafe(true);
+    }
   };
 
   const editRow = (value) => {
@@ -92,6 +146,28 @@ const Cafe = () => {
     return;
   };
 
+  const openEmployeeByName = (event) => {
+    const { employees, name, location } = event.data;
+    if (employees <= 0) {
+      setShowSnack(true);
+      setSnackMessage("This cafe does not have any employees");
+      return;
+    }
+    navigate(`/employee?name=${name}`);
+    return;
+  };
+
+  const openEmployeeByLocation = (event) => {
+    const { employees, name, location } = event.data;
+    if (employees <= 0) {
+      setShowSnack(true);
+      setSnackMessage("This cafe does not have any employees");
+      return;
+    }
+    navigate(`/employee?location=${location}`);
+    return;
+  };
+
   const EditButtonComponent = (value) =>
     useMemo(() => {
       return (
@@ -112,15 +188,32 @@ const Cafe = () => {
       );
     }, []);
 
+  const ImageComponent = (value) =>
+    useMemo(() => {
+      return <ShowImage blobImage={value.data.logo} />;
+    }, []);
+
   const columns = [
     {
       headerName: "UUID",
       field: "id",
     },
-    { headerName: "Name", field: "name" },
+    {
+      headerName: "Name",
+      field: "name",
+      onCellClicked: (event) => {
+        openEmployeeByName(event);
+      },
+    },
     { headerName: "Description", field: "description" },
-    { headerName: "Logo", field: "logo" },
-    { headerName: "Location", field: "location" },
+    { headerName: "Logo", field: "logo", cellRenderer: ImageComponent },
+    {
+      headerName: "Location",
+      field: "location",
+      onCellClicked: (event) => {
+        openEmployeeByLocation(event);
+      },
+    },
     {
       headerName: "Number of Employees",
       field: "employees",
@@ -136,11 +229,17 @@ const Cafe = () => {
   ];
 
   if (addMode) {
-    return <AddCafe returnToCafe={returnToCafe} />;
+    return <AddCafe returnToCafe={returnToCafe} action={CONSTANTS.CREATE} />;
   }
 
   if (editMode) {
-    return <EditCafe editData={editData} returnToCafe={returnToCafe} />;
+    return (
+      <EditCafe
+        editData={editData}
+        returnToCafe={returnToCafe}
+        action={CONSTANTS.UPDATE}
+      />
+    );
   }
 
   return (
@@ -161,7 +260,7 @@ const Cafe = () => {
       >
         Go to Employee Page
       </Button>
-      <Button className={styles.returnButton} onClick={() => fetchCafe()}>
+      <Button className={styles.returnButton} onClick={() => GetCafe()}>
         Reset Cafe information
       </Button>
 
@@ -173,7 +272,7 @@ const Cafe = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => closeDialog()}>Disagree</Button>
-          <Button onClick={() => console.log("agree")}>Agree</Button>
+          <Button onClick={() => DeleteCafe(deleteData.id)}>Agree</Button>
         </DialogActions>
       </Dialog>
 

@@ -5,30 +5,23 @@ import Table from "../common/Table";
 import {
   Stack,
   Button,
-  Typography,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Snackbar,
   Alert,
-  Container,
-  Box,
 } from "@mui/material";
 import EditEmployee from "./EditEmployee";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  fetchAllEmployees,
-  fetchAllEmployeesByCafeLocation,
-  fetchAllEmployeesByCafeName,
-  fetchEmployeesByCafeNameAndLocation,
-} from "./services/employee.service";
+import EmployeeService from "./services/employee.service";
 
 import Card from "../common/Card";
 
 import styles from "./styles/Employee.module.css";
 import Header from "../common/Header";
 import AddEmployee from "./AddEmployee";
+import CONSTANTS from "../common/constants/actions";
 const Employee = () => {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState([]);
@@ -70,7 +63,7 @@ const Employee = () => {
       return;
     }
 
-    getEmployee();
+    GetEmployee();
   }, []);
 
   const addNewEmployee = () => {
@@ -83,10 +76,14 @@ const Employee = () => {
     setEditMode(true);
   };
 
-  const returnToEmployee = () => {
+  const returnToEmployee = (getAllData) => {
     setEditData([]);
     setEditMode(false);
     setAddMode(false);
+
+    if (getAllData) {
+      GetEmployee(true);
+    }
   };
 
   const deleteRow = (value) => {
@@ -134,8 +131,20 @@ const Employee = () => {
     { headerName: "Phone Number", field: "phone_number" },
     { headerName: "Gender", field: "gender" },
     { headerName: "Days Worked", field: "days_worked" },
-    { headerName: "Cafe Name", field: "cafe_name" },
-    { headerName: "Cafe Location", field: "cafe_location" },
+    {
+      headerName: "Cafe Name",
+      field: "cafe_name",
+      onCellClicked: (event) => {
+        openCafeByCafeName(event);
+      },
+    },
+    {
+      headerName: "Cafe Location",
+      field: "location",
+      onCellClicked: (event) => {
+        openCafeByLocation(event);
+      },
+    },
     {
       headerName: "Actions",
       field: "actions",
@@ -143,26 +152,41 @@ const Employee = () => {
     },
   ];
 
-  const getEmployee = () => {
-    fetchAllEmployees().then((res) => {
+  const DeleteEmployee = useCallback((id) => {
+    EmployeeService.deleteEmployeeById(id)
+      .then((res) => {
+        closeDialog();
+        setShowSnack(true);
+        setSnackMessage("Succesfully deleted Employee");
+        GetEmployee(true);
+      })
+      .then(() => console.log("deleted"));
+  }, []);
+
+  const GetEmployee = useCallback((stopEmitToast) => {
+    EmployeeService.fetchAllEmployees().then((res) => {
       console.log(res.data);
       dispatch(employeeActions.add(res.data));
     });
-    setShowSnack(true);
-    setSnackMessage("Succesfully fetched Employee information");
-  };
+
+    if (!stopEmitToast) {
+      setShowSnack(true);
+      setSnackMessage("Succesfully fetched Employee information");
+    }
+  });
 
   const GetEmployeeByNameAndLocation = useCallback(() => {
-    fetchEmployeesByCafeNameAndLocation(nameParams, locationParams).then(
-      (res) => {
-        console.log(res.data);
-        dispatch(employeeActions.add(res.data));
-      }
-    );
+    EmployeeService.fetchEmployeesByCafeNameAndLocation(
+      nameParams,
+      locationParams
+    ).then((res) => {
+      console.log(res.data);
+      dispatch(employeeActions.add(res.data));
+    });
   }, []);
 
   const GetAllEmployeesByCafeName = useCallback(() => {
-    fetchAllEmployeesByCafeName(nameParams)
+    EmployeeService.fetchAllEmployeesByCafeName(nameParams)
       .then((res) => {
         console.log(res.data);
         dispatch(employeeActions.add(res.data));
@@ -173,7 +197,7 @@ const Employee = () => {
   }, []);
 
   const GetAllEmployeesByCafeLocation = useCallback(() => {
-    fetchAllEmployeesByCafeLocation(locationParams)
+    EmployeeService.fetchAllEmployeesByCafeLocation(locationParams)
       .then((res) => {
         console.log(res.data);
         dispatch(employeeActions.add(res.data));
@@ -183,13 +207,34 @@ const Employee = () => {
       });
   }, []);
 
+  const openCafeByLocation = (event) => {
+    const { location } = event.data;
+    navigate(`/cafe?location=${location}`);
+    return;
+  };
+
+  const openCafeByCafeName = (event) => {
+    const { cafe_name } = event.data;
+    navigate(`/cafe?name=${cafe_name}`);
+    return;
+  };
+
   if (addMode) {
-    return <AddEmployee returnToEmployee={returnToEmployee} />;
+    return (
+      <AddEmployee
+        returnToEmployee={returnToEmployee}
+        action={CONSTANTS.CREATE}
+      />
+    );
   }
 
   if (editMode) {
     return (
-      <EditEmployee editData={editData} returnToEmployee={returnToEmployee} />
+      <EditEmployee
+        editData={editData}
+        action={CONSTANTS.UPDATE}
+        returnToEmployee={returnToEmployee}
+      />
     );
   }
 
@@ -209,7 +254,7 @@ const Employee = () => {
       <Button className={styles.returnButton} onClick={() => navigate("/cafe")}>
         Go to Cafe Page
       </Button>
-      <Button className={styles.returnButton} onClick={() => getEmployee()}>
+      <Button className={styles.returnButton} onClick={() => GetEmployee()}>
         Reset Employee information
       </Button>
 
@@ -220,7 +265,7 @@ const Employee = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => closeDialog()}>Disagree</Button>
-          <Button onClick={() => console.log("agree")}>Agree</Button>
+          <Button onClick={() => DeleteEmployee(deleteData.id)}>Agree</Button>
         </DialogActions>
       </Dialog>
 

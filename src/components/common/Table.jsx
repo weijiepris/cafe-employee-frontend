@@ -1,5 +1,6 @@
 import React from "react";
 import { AgGridReact } from "ag-grid-react";
+
 import "./styles/Table.css";
 import { defaultColDef } from "./utilities/TableSettings";
 
