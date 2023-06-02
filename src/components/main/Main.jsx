@@ -1,13 +1,9 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { cafeActions } from "../../redux/cafeReducer";
 import "../../styles/Main.css";
 
 const Main = () => {
-  const isLoaded = useSelector((state) => state.cafe.isLoaded);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const redirectToCafe = () => {

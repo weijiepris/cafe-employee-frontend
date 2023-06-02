@@ -1,0 +1,13 @@
+@import "../../../styles/variables/variables.scss";
+
+.returnButton {
+  background: $primaryColor !important;
+  color: $bgColor !important;
+  padding: 15px !important;
+  margin: 5px !important;
+}
+
+.returnButton:hover {
+  background: $secondaryColor !important;
+  color: $textColor !important;
+}
