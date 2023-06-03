@@ -15,6 +15,10 @@ export function requestGetEmployee() {
 
   return axios.request({
     method: "get",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
     url: "http://localhost:3001/employees",
   });
 }
