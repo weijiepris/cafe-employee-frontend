@@ -91,7 +91,8 @@ const AddEmployee = ({ returnToEmployee, action }) => {
       .then((res) => res.data)
       .catch((err) => {
         setShowSnack(true);
-        setSnackMessage(err.response.data);
+        console.log(err);
+        // setSnackMessage(err);
       });
 
     let nameSet = new Set(fetchedCafes.map((cafe) => InitCap(cafe.name)));

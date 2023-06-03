@@ -105,14 +105,14 @@ export const validateInputForEmployeeCreation = (
         reject({
           input: "cafeName",
           message:
-            "Invalid cafe name provided. Must be at least 6 characters and at most 10 characters",
+            "Invalid cafe name provided. Must not be empty",
         });
       }
       if (!validLocationCheck(location.trim())) {
         reject({
           input: "location",
           message:
-            "Invalid location provided. Please ensure that image size does not exceed 2mb",
+            "Invalid location provided. Must not be empty",
         });
       }
     }

@@ -275,6 +275,7 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={cafeValue}
+              inputRef={cafeNameRef}
               label="Select a Cafe"
               style={{ textAlign: "left" }}
               onChange={handleCafeChange}
@@ -297,6 +298,7 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={locationValue}
+              inputRef={locationRef}
               label="Select a Location"
               style={{ textAlign: "left" }}
               onChange={handleLocationChange}
