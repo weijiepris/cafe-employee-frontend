@@ -59,7 +59,7 @@ const AddCafe = ({ action, returnToCafe }) => {
 
     validateInputForCafeCreation(name, description, location, selectedImage)
       .then(() => {
-        let formData = iFormData
+        let formData = iFormData;
         if (formData) {
           const blobImage = new Blob([selectedImage], {
             type: selectedImage.type,
@@ -173,11 +173,11 @@ const AddCafe = ({ action, returnToCafe }) => {
         </Form>
         <br />
         <br />
-        <Button className={styles.returnButton} onClick={create}>
-          Create Cafe
-        </Button>
         <Button className={styles.returnButton} onClick={softReturn}>
           Go back
+        </Button>
+        <Button className={styles.returnButton} onClick={create}>
+          Create Cafe
         </Button>
       </Card>
 

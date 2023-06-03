@@ -2,6 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import "../../styles/Main.css";
+import Card from "../common/Card";
+import Header from "../common/Header";
+import { Button } from "@mui/material";
+
+import styles from "./styles/Main.module.css";
 
 const Main = () => {
   const navigate = useNavigate();
@@ -12,22 +17,24 @@ const Main = () => {
   const redirectToEmployee = () => {
     navigate("/employee");
   };
-  //   if (!isLoaded) {
-  //     return (
-  //       <>
-  //         <div>NOT LOADED</div>
-  //         <button onClick={() => dispatch(cafeActions.add({ isLoaded: true }))}>
-  //           Load Cafe
-  //         </button>
-  //       </>
-  //     );
-  //   }
 
   return (
     <>
-      <div className="">Main</div>
-      <button onClick={() => redirectToCafe()}>Go to Cafe</button>
-      <button onClick={() => redirectToEmployee()}>Go to Employee</button>
+      <Card>
+        <Header>Employee Cafe Main Page</Header>
+        <Button
+          className={styles.returnButton}
+          onClick={() => redirectToCafe()}
+        >
+          Go to Cafe
+        </Button>
+        <Button
+          className={styles.returnButton}
+          onClick={() => redirectToEmployee()}
+        >
+          Go to Employee
+        </Button>
+      </Card>
     </>
   );
 };
