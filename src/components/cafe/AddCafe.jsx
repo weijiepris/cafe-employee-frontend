@@ -22,6 +22,7 @@ const AddCafe = ({ action, returnToCafe }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
+  const [iFormData, setIFormData] = useState();
 
   const nameRef = useRef();
   const descriptionRef = useRef();
@@ -58,8 +59,8 @@ const AddCafe = ({ action, returnToCafe }) => {
 
     validateInputForCafeCreation(name, description, location, selectedImage)
       .then(() => {
-        const formData = new FormData();
-        if (selectedImage) {
+        let formData = iFormData
+        if (formData) {
           const blobImage = new Blob([selectedImage], {
             type: selectedImage.type,
           });
@@ -72,6 +73,8 @@ const AddCafe = ({ action, returnToCafe }) => {
             );
             setShowSnack(true);
           }
+        } else {
+          formData = new FormData();
         }
 
         formData.append("name", name);
@@ -117,6 +120,10 @@ const AddCafe = ({ action, returnToCafe }) => {
         setSelectedImage(null);
         return;
       }
+
+      const formData = new FormData();
+      formData.append("image", file);
+      setIFormData(formData);
 
       setSelectedImage(URL.createObjectURL(file));
     } else {

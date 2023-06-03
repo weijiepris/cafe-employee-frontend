@@ -1,19 +1,25 @@
-import { createSlice } from "@reduxjs/toolkit";
+export const GET_CAFES = "GET_CAFES";
+export const SET_CAFES = "SET_CAFES";
 
-const initialCafeState = {
-  data: [],
-};
-
-const cafeSlice = createSlice({
-  name: "cafe",
-  initialState: initialCafeState,
-  reducers: {
-    add(state, action) {
-      console.log("hello", action.payload);
-      state.data = action.payload;
-    },
-  },
+export const getCafes = () => ({
+  type: GET_CAFES,
 });
 
-export const cafeActions = cafeSlice.actions;
-export default cafeSlice.reducer;
+export const setCafes = (cafes) => ({
+  type: SET_CAFES,
+  cafes,
+});
+
+const initialCafeState = {
+  cafes: [],
+};
+
+export default (state = initialCafeState, action) => {
+  switch (action.type) {
+    case SET_CAFES:
+      const { cafes } = action;
+      return { ...state, cafes };
+    default:
+      return state;
+  }
+};

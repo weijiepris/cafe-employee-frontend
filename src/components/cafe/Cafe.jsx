@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { cafeActions } from "../../redux/cafeReducer";
 import {
   Stack,
   Button,
@@ -22,6 +21,7 @@ import AddCafe from "./AddCafe";
 import ShowImage from "../common/ShowImage";
 import CafeService from "./services/cafe.service";
 import CONSTANTS from "../common/constants/actions";
+import { getCafes, setCafes } from "../../redux/cafeReducer";
 
 const Cafe = () => {
   const [addMode, setAddMode] = useState(false);
@@ -34,7 +34,7 @@ const Cafe = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const cafe = useSelector((state) => state.cafe.data);
+  const cafe = useSelector((state) => state.cafe.cafes);
 
   // to get url params
   const location = useLocation();
@@ -68,10 +68,7 @@ const Cafe = () => {
   }, []);
 
   const GetCafe = useCallback((stopEmitToast) => {
-    CafeService.fetchCafe().then((res) => {
-      console.log(res.data);
-      dispatch(cafeActions.add(res.data));
-    });
+    dispatch(getCafes())
     if (!stopEmitToast) {
       setShowSnack(true);
       setSnackMessage("Succesfully fetched cafe information");
@@ -81,14 +78,14 @@ const Cafe = () => {
   const GetCafeByLocation = useCallback((locationParams) => {
     CafeService.fetchCafeByLocation(locationParams).then((res) => {
       console.log(res.data);
-      dispatch(cafeActions.add(res.data));
+      dispatch(setCafes(res.data));
     });
   });
 
   const GetCafeByName = useCallback((nameParams) => {
     CafeService.fetchCafeByCafeName(nameParams).then((res) => {
       console.log(res.data);
-      dispatch(cafeActions.add(res.data));
+      dispatch(setCafes(res.data));
     });
   });
 

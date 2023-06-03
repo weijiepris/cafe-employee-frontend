@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { employeeActions } from "../../redux/employeeReducer";
+import { getEmployees, setEmployees } from "../../redux/employeeReducer";
 import Table from "../common/Table";
 import {
   Stack,
@@ -35,7 +35,7 @@ const Employee = () => {
   const locationParams = params.get("location");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const employee = useSelector((state) => state.employee.data);
+  const employee = useSelector((state) => state.employee.employees);
 
   useEffect(() => {
     console.log("name:", nameParams, " location:", locationParams);
@@ -77,7 +77,6 @@ const Employee = () => {
   };
 
   const deleteRow = (value) => {
-    console.log(value.data);
     setDeleteData(value.data);
     openDialog();
   };
@@ -153,14 +152,16 @@ const Employee = () => {
         setSnackMessage("Successfully deleted Employee");
         GetEmployee(true);
       })
-      .then(() => console.log("deleted"));
+      .then(() => console.log("deleted"))
+      .catch((err) => {
+        setShowSnack(true);
+        setSnackMessage(err.response.data);
+      });
   }, []);
 
   const GetEmployee = useCallback((stopEmitToast) => {
-    EmployeeService.fetchAllEmployees().then((res) => {
-      console.log(res.data);
-      dispatch(employeeActions.add(res.data));
-    });
+    dispatch(getEmployees());
+
     if (!stopEmitToast) {
       setShowSnack(true);
       setSnackMessage("Successfully fetched Employee information");
@@ -171,20 +172,26 @@ const Employee = () => {
     EmployeeService.fetchEmployeesByCafeNameAndLocation(
       nameParams,
       locationParams
-    ).then((res) => {
-      console.log(res.data);
-      dispatch(employeeActions.add(res.data));
-    });
+    )
+      .then((res) => {
+        console.log(res.data);
+        dispatch(setEmployees(res.data));
+      })
+      .catch((err) => {
+        setShowSnack(true);
+        setSnackMessage(err.response.data);
+      });
   }, []);
 
   const GetAllEmployeesByCafeName = useCallback(() => {
     EmployeeService.fetchAllEmployeesByCafeName(nameParams)
       .then((res) => {
         console.log(res.data);
-        dispatch(employeeActions.add(res.data));
+        dispatch(setEmployees(res.data));
       })
-      .then((err) => {
-        console.log(err);
+      .catch((err) => {
+        setShowSnack(true);
+        setSnackMessage(err.response.data);
       });
   }, []);
 
@@ -192,22 +199,27 @@ const Employee = () => {
     EmployeeService.fetchAllEmployeesByCafeLocation(locationParams)
       .then((res) => {
         console.log(res.data);
-        dispatch(employeeActions.add(res.data));
+        dispatch(setEmployees(res.data));
       })
-      .then((err) => {
-        console.log(err);
+      .catch((err) => {
+        setShowSnack(true);
+        setSnackMessage(err.response.data);
       });
   }, []);
 
   const openCafeByLocation = (event) => {
     const { location } = event.data;
-    navigate(`/cafe?location=${location}`);
+    if (location) {
+      navigate(`/cafe?location=${location}`);
+    }
     return;
   };
 
   const openCafeByCafeName = (event) => {
     const { cafe_name } = event.data;
-    navigate(`/cafe?name=${cafe_name}`);
+    if (cafe_name) {
+      navigate(`/cafe?name=${cafe_name}`);
+    }
     return;
   };
 

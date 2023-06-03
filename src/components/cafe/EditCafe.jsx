@@ -151,11 +151,11 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
         </Form>
         <br />
         <br />
-        <Button className={styles.returnButton} onClick={() => softReturn()}>
-          Go back
-        </Button>
         <Button className={styles.returnButton} onClick={() => editCafe()}>
           Edit Cafe
+        </Button>
+        <Button className={styles.returnButton} onClick={() => softReturn()}>
+          Go back
         </Button>
       </Card>
 

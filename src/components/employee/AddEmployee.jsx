@@ -58,9 +58,12 @@ const AddEmployee = ({ returnToEmployee, action }) => {
   useMemo(async () => {
     console.log(cafeValue);
     if (cafeValue) {
-      const fetchedLocation = await CafeService.fetchCafeByCafeName(
-        cafeValue
-      ).then((res) => res.data);
+      const fetchedLocation = await CafeService.fetchCafeByCafeName(cafeValue)
+        .then((res) => res.data)
+        .catch((err) => {
+          setShowSnack(true);
+          setSnackMessage(err.response.data);
+        });
 
       console.log(fetchedLocation);
 
@@ -84,7 +87,12 @@ const AddEmployee = ({ returnToEmployee, action }) => {
   };
 
   const GetAllCafe = useCallback(async () => {
-    const fetchedCafes = await CafeService.fetchCafe().then((res) => res.data);
+    const fetchedCafes = await CafeService.fetchCafe()
+      .then((res) => res.data)
+      .catch((err) => {
+        setShowSnack(true);
+        setSnackMessage(err.response.data);
+      });
 
     let nameSet = new Set(fetchedCafes.map((cafe) => InitCap(cafe.name)));
 
