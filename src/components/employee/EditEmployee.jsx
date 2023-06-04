@@ -245,6 +245,14 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
           date_end: tempDateEnd
         };
 
+        console.log("process", employeeObject)
+
+        var timestamp = Date.parse(employeeObject.date_start);
+
+        if (isNaN(timestamp)) {
+          employeeObject.date_start = null;
+        }
+
         UpdateEmployee(employeeObject);
 
         returnToEmployee();
@@ -279,6 +287,10 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
           dateStartRef.current.focus();
           setSnackMessage(err.message);
         }
+        if (err.input === "dateStart") {
+          dateStartRef.current.focus();
+          setSnackMessage(err.message);
+        }
         if (err.input === "dateEnd") {
           dateEndRef.current.focus();
           setSnackMessage(err.message);
@@ -288,7 +300,7 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
   };
 
   const UpdateEmployee = useCallback((data) => {
-    console.log("here")
+    console.log("here", data)
     EmployeeService.updateEmployee(data)
       .then((res) => {
         returnToEmployee(true);

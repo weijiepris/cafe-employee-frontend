@@ -117,6 +117,16 @@ export const validateInputForEmployeeCreation = (
             "Invalid location provided. Must not be empty",
         });
       }
+      if(tempDateStart){
+        if (new Date().getTime() < new Date(tempDateStart).getTime()) {
+          reject({
+            input: "dateStart",
+            message:
+              "Start date cannot be after today",
+          });
+        }
+      }
+
       // compare date
       if (tempDateEnd) {
         if (new Date(tempDateEnd).getTime() < new Date(tempDateStart).getTime()) {
