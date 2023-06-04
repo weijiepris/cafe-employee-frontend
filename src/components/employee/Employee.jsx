@@ -71,6 +71,7 @@ const Employee = () => {
     setEditData([]);
     setEditMode(false);
     setAddMode(false);
+    console.log("getAllData", getAllData)
     if (getAllData) {
       GetEmployee(true);
     }

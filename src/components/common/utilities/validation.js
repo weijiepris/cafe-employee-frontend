@@ -69,7 +69,9 @@ export const validateInputForEmployeeCreation = (
   phoneNumber,
   gender,
   cafeName,
-  location
+  location,
+  tempDateStart,
+  tempDateEnd
 ) => {
   return new Promise((resolve, reject) => {
     if (!validNameCheck(name.trim())) {
@@ -114,6 +116,16 @@ export const validateInputForEmployeeCreation = (
           message:
             "Invalid location provided. Must not be empty",
         });
+      }
+      // compare date
+      if (tempDateEnd) {
+        if (new Date(tempDateEnd).getTime() < new Date(tempDateStart).getTime()) {
+          reject({
+            input: "dateEnd",
+            message:
+              "End date cannot be before start date",
+          });
+        }
       }
     }
 

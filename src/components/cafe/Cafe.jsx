@@ -145,11 +145,6 @@ const Cafe = () => {
 
   const openEmployeeByName = useCallback((event) => {
     const { employees, name, location } = event.data;
-    if (employees <= 0) {
-      setShowSnack(true);
-      setSnackMessage("This cafe does not have any employees");
-      return;
-    }
     navigate(`/employee?name=${name}`);
     return;
   }, []);

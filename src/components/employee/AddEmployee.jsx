@@ -20,8 +20,12 @@ import {
   Radio,
   RadioGroup,
   Select,
-  Snackbar,
+  Snackbar
 } from "@mui/material";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+
 
 import styles from "./styles/Employee.module.css";
 import Card from "../common/Card";
@@ -50,6 +54,7 @@ const AddEmployee = ({ returnToEmployee, action }) => {
   const genderRef = useRef();
   const cafeNameRef = useRef();
   const locationRef = useRef();
+  const dateStartRef = useRef();
 
   useEffect(() => {
     GetAllCafe();
@@ -113,6 +118,8 @@ const AddEmployee = ({ returnToEmployee, action }) => {
     const gender = radioValue;
     const cafeName = cafeValue;
     const location = locationValue;
+    const dateStart = dateStartRef;
+
     validateInputForEmployeeCreation(
       name,
       email,
@@ -122,6 +129,12 @@ const AddEmployee = ({ returnToEmployee, action }) => {
       location
     )
       .then(() => {
+
+        let date_start;
+        if (dateStart.current) {
+          date_start = dateStartRef.current.value;
+        }
+
         const employeeObject = {
           name,
           email_address: email,
@@ -129,8 +142,10 @@ const AddEmployee = ({ returnToEmployee, action }) => {
           gender: radioValue,
           cafe: cafeName,
           location,
+          date_start
         };
 
+        console.log(employeeObject)
         CreateEmployee(employeeObject);
         return;
       })
@@ -281,6 +296,13 @@ const AddEmployee = ({ returnToEmployee, action }) => {
               ))}
             </Select>
           </Form>
+          <br />
+          {locationValue !== "" &&
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label="Date start" defaultValue={dayjs(new Date())} inputRef={dateStartRef} />
+            </LocalizationProvider>
+          }
+
         </Form>
         <br />
         <br />

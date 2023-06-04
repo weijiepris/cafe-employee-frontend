@@ -17,6 +17,8 @@ import {
   Select,
   Snackbar,
 } from "@mui/material";
+import dayjs, { Dayjs } from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import CafeService from "../cafe/services/cafe.service";
 import Card from "../common/Card";
@@ -29,6 +31,7 @@ import { validateInputForEmployeeCreation } from "../common/utilities/validation
 import CONSTANTS from "../common/constants/actions";
 import EmployeeService from "./services/employee.service";
 import styles from "./styles/Employee.module.css";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 
 const EditEmployee = ({ editData, returnToEmployee, action }) => {
   const [showSnack, setShowSnack] = useState(false);
@@ -48,6 +51,8 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
   const genderRef = useRef();
   const cafeNameRef = useRef();
   const locationRef = useRef();
+  const dateStartRef = useRef();
+  const dateEndRef = useRef();
 
   useEffect(() => {
     GetAllCafe();
@@ -122,9 +127,13 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
     const phoneNumber = phoneNumberRef.current.value;
     const cafeName = cafeValue;
     const location = locationValue;
+    const date_start = dateStartRef;
+    const date_end = dateEndRef;
 
     let tempCafeName = cafeName;
     let tempLocation = location;
+    let tempDateStart = date_start;
+    let tempDateEnd = date_end;
 
     if (tempLocation === "") {
       tempLocation = null;
@@ -132,13 +141,28 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
     if (tempCafeName === "") {
       tempCafeName = null;
     }
+
+    if (!tempDateStart || !tempDateStart.current) {
+      tempDateStart = null;
+    } else {
+      tempDateStart = tempDateStart.current.value
+    }
+
+    if (!tempDateEnd || !tempDateEnd.current || tempDateEnd.current.value == "") {
+      tempDateEnd = null;
+    } else {
+      tempDateEnd = tempDateEnd.current.value
+    }
+
     if (
       action === CONSTANTS.UPDATE &&
       (name.toLowerCase() !== editData.name.toLowerCase() ||
         email.toLowerCase() !== editData.email_address.toLowerCase() ||
         Number(phoneNumber) !== editData.phone_number ||
         tempCafeName !== editData.cafe_name ||
-        tempLocation !== editData.location)
+        tempLocation !== editData.location) ||
+      new Date(tempDateStart).getTime() !== new Date(editData.date_start).getTime() ||
+      new Date(tempDateEnd).getTime() !== new Date(editData.date_end).getTime()
     ) {
       setDisplayDialog(true);
     } else {
@@ -153,9 +177,14 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
     const gender = genderRef.current.value;
     const cafeName = cafeValue;
     const location = locationValue;
+    const date_start = dateStartRef;
+    const date_end = dateEndRef;
+
 
     let tempCafeName = cafeName;
     let tempLocation = location;
+    let tempDateStart = date_start;
+    let tempDateEnd = date_end;
 
     if (tempLocation === "") {
       tempLocation = null;
@@ -164,13 +193,29 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
       tempCafeName = null;
     }
 
+    if (!tempDateStart || !tempDateStart.current) {
+      tempDateStart = null;
+    } else {
+      tempDateStart = tempDateStart.current.value
+    }
+
+    if (!tempDateEnd || !tempDateEnd.current || tempDateEnd.current.value == "") {
+      tempDateEnd = null;
+    } else {
+      tempDateEnd = tempDateEnd.current.value
+    }
+
+    console.log(tempDateStart, tempDateEnd)
+
     if (
       name === editData.name &&
       email === editData.email_address &&
       Number(phoneNumber) === editData.phone_number &&
       gender === editData.gender &&
       tempCafeName === editData.cafe_name &&
-      tempLocation === editData.location
+      tempLocation === editData.location &&
+      new Date(tempDateStart).getTime() === new Date(editData.date_start).getTime() &&
+      new Date(tempDateEnd).getTime() === new Date(editData.date_end).getTime()
     ) {
       setShowSnack(true);
       setSnackMessage("There are no changes to make, please check again");
@@ -183,7 +228,9 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
       phoneNumber,
       gender,
       cafeName,
-      location
+      location,
+      tempDateStart,
+      tempDateEnd
     )
       .then(() => {
         const employeeObject = {
@@ -194,6 +241,8 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
           gender: gender.toUpperCase(),
           cafe: cafeName,
           location,
+          date_start: tempDateStart,
+          date_end: tempDateEnd
         };
 
         UpdateEmployee(employeeObject);
@@ -226,18 +275,27 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
           locationRef.current.focus();
           setSnackMessage(err.message);
         }
+        if (err.input === "dateStart") {
+          dateStartRef.current.focus();
+          setSnackMessage(err.message);
+        }
+        if (err.input === "dateEnd") {
+          dateEndRef.current.focus();
+          setSnackMessage(err.message);
+        }
         setShowSnack(true);
       });
   };
 
   const UpdateEmployee = useCallback((data) => {
+    console.log("here")
     EmployeeService.updateEmployee(data)
       .then((res) => {
         returnToEmployee(true);
       })
       .catch((err) => {
         setShowSnack(true);
-        setSnackMessage(err.response.data);
+        console.log(err)
       });
   }, []);
 
@@ -311,6 +369,22 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
               ))}
             </Select>
           </Form>
+          <br />
+          {locationValue !== "" &&
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label="Date start" defaultValue={dayjs(editData.date_start)} inputRef={dateStartRef} />
+            </LocalizationProvider>
+          }
+          <br />
+          {locationValue !== "" && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              {editData.date_end ? (
+                <DatePicker label="Date end" defaultValue={dayjs(editData.date_end)} inputRef={dateEndRef} />
+              ) : (
+                <DatePicker label="Date end" inputRef={dateEndRef} />
+              )}
+            </LocalizationProvider>
+          )}
         </Form>
         <br />
         <br />

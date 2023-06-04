@@ -29,6 +29,7 @@ EmployeeService.createEmployee = (employeeObject) => {
 };
 
 EmployeeService.updateEmployee = (employeeObject) => {
+  console.log(employeeObject)
   return axios.put(`http://localhost:3001/employees/`, employeeObject);
 };
 
