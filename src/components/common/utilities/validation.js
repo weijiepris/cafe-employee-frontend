@@ -106,34 +106,56 @@ export const validateInputForEmployeeCreation = (
       if (!validNameCheck(cafeName.trim())) {
         reject({
           input: "cafeName",
-          message:
-            "Invalid cafe name provided. Must not be empty",
+          message: "Invalid cafe name provided. Must not be empty",
         });
       }
       if (!validLocationCheck(location.trim())) {
         reject({
           input: "location",
-          message:
-            "Invalid location provided. Must not be empty",
+          message: "Invalid location provided. Must not be empty",
         });
       }
-      if(tempDateStart){
-        if (new Date().getTime() < new Date(tempDateStart).getTime()) {
+      console.log("hereee", tempDateStart);
+      if (tempDateStart) {
+        const temp_start = new Date(tempDateStart);
+        if (isNaN(temp_start.getTime())) {
           reject({
             input: "dateStart",
             message:
-              "Start date cannot be after today",
+              "You have inputted a invalid date, please check and try again",
+          });
+        }
+
+        if (new Date().getTime() < new Date(tempDateStart).getTime()) {
+          reject({
+            input: "dateStart",
+            message: "Start date cannot be after today",
           });
         }
       }
 
       // compare date
       if (tempDateEnd) {
-        if (new Date(tempDateEnd).getTime() < new Date(tempDateStart).getTime()) {
+        const temp_end = new Date(tempDateEnd);
+        if (isNaN(temp_end.getTime())) {
           reject({
             input: "dateEnd",
             message:
-              "End date cannot be before start date",
+              "You have inputted a invalid date, please check and try again",
+          });
+        }
+        if (new Date().getTime() < new Date(tempDateEnd).getTime()) {
+          reject({
+            input: "dateEnd",
+            message: "End date cannot be after today",
+          });
+        }
+        if (
+          new Date(tempDateEnd).getTime() < new Date(tempDateStart).getTime()
+        ) {
+          reject({
+            input: "dateEnd",
+            message: "End date cannot be before start date",
           });
         }
       }
