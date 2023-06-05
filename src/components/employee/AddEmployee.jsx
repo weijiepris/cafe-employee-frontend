@@ -126,6 +126,7 @@ const AddEmployee = ({ returnToEmployee, action }) => {
     } else {
       tempDateStart = tempDateStart.current.value;
     }
+
     validateInputForEmployeeCreation(
       name,
       email,
