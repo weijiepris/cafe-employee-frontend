@@ -52,13 +52,13 @@ export const validateInputForCafeCreation = (
           "Invalid location provided. Cannot be empty, and at most 255 characters",
       });
     }
-    // if (!selectedImage) {
-    //   reject({
-    //     input: "logo",
-    //     message:
-    //       "Invalid logo provided. Please ensure that image size does not exceed 2mb",
-    //   });
-    // }
+    if (!selectedImage) {
+      reject({
+        input: "logo",
+        message:
+          "Invalid logo provided. Please ensure that image size does not exceed 2mb",
+      });
+    }
     resolve();
   });
 };

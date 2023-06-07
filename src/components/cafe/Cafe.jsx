@@ -22,6 +22,7 @@ import ShowImage from "../common/ShowImage";
 import CafeService from "./services/cafe.service";
 import CONSTANTS from "../common/constants/actions";
 import { getCafes, setCafes } from "../../redux/cafeReducer";
+import Image from "../common/Image";
 
 const Cafe = () => {
   const [addMode, setAddMode] = useState(false);
@@ -68,7 +69,7 @@ const Cafe = () => {
   }, []);
 
   const GetCafe = useCallback((stopEmitToast) => {
-    dispatch(getCafes())
+    dispatch(getCafes());
     if (!stopEmitToast) {
       setShowSnack(true);
       setSnackMessage("Succesfully fetched cafe information");
@@ -180,10 +181,9 @@ const Cafe = () => {
       );
     }, []);
 
-  const ImageComponent = (value) =>
-    useMemo(() => {
-      return <ShowImage blobImage={value.data.logo} />;
-    }, []);
+  const ImageComponent = (value) => {
+    return <Image logo={value.data.logo} />;
+  };
 
   const columns = useMemo(
     () => [
@@ -270,7 +270,6 @@ const Cafe = () => {
           <Button onClick={() => DeleteCafe(deleteData.id)}>Agree</Button>
         </DialogActions>
       </Dialog>
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={showSnack}

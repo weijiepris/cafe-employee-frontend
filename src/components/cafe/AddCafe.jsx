@@ -60,20 +60,7 @@ const AddCafe = ({ action, returnToCafe }) => {
     validateInputForCafeCreation(name, description, location, selectedImage)
       .then(() => {
         let formData = iFormData;
-        if (formData) {
-          const blobImage = new Blob([selectedImage], {
-            type: selectedImage.type,
-          });
-
-          try {
-            formData.append("image", blobImage, "image.jpg");
-          } catch (err) {
-            setSnackMessage(
-              "An unexpected error occurred, please refresh the page and try again."
-            );
-            setShowSnack(true);
-          }
-        } else {
+        if (!formData) {
           formData = new FormData();
         }
 
@@ -92,6 +79,9 @@ const AddCafe = ({ action, returnToCafe }) => {
           setSnackMessage(err.message);
         } else if (err.input === "location") {
           locationRef.current.focus();
+          setSnackMessage(err.message);
+        } else if (err.input === "logo") {
+          logoRef.current.focus();
           setSnackMessage(err.message);
         }
         setShowSnack(true);

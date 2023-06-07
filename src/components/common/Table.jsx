@@ -10,7 +10,7 @@ const Table = ({ data, columns }) => {
       <div
         className="ag-theme-alpine "
         style={{
-          height: "300px",
+          height: "600px",
           width: "99vw",
           textAlign: "center",
           margin: "0 auto",
