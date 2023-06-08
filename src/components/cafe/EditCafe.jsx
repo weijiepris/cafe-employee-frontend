@@ -16,14 +16,11 @@ import TextBox from "../common/TextBox";
 import { validateInputForCafeCreation } from "../common/utilities/validation";
 import CafeService from "./services/cafe.service";
 import CONSTANTS from "../common/constants/actions";
-import Image from "../common/Image";
 
 const EditCafe = ({ editData, returnToCafe, action }) => {
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const [displayDialog, setDisplayDialog] = useState(false);
-  const [selectedImage, setSelectedImage] = useState();
-  const [iFormData, setIFormData] = useState();
 
   const descriptionRef = useRef();
   const locationRef = useRef();
@@ -100,39 +97,6 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
     }
   };
 
-  const handleImageChange = useCallback((event) => {
-    const file = event.target.files[0];
-
-    if (file) {
-      // Check file extension
-      const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-      if (!allowedExtensions.test(file.name)) {
-        setShowSnack(true);
-        setSnackMessage(
-          "Invalid file format. Only JPG, JPEG, PNG, and GIF files are allowed."
-        );
-        setSelectedImage(null);
-        return;
-      }
-
-      const maxSize = 2 * 1024 * 1024; // 2MB
-      if (file.size > maxSize) {
-        setShowSnack(true);
-        setSnackMessage("File size exceeds the maximum limit of 2MB.");
-        setSelectedImage(null);
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("image", file);
-      setIFormData(formData);
-
-      setSelectedImage(URL.createObjectURL(file));
-    } else {
-      setSelectedImage(null);
-    }
-  }, []);
-
   const updateCafe = useCallback(
     (cafeObject) => {
       CafeService.updateCafe(cafeObject)
@@ -162,14 +126,6 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
           />
           <br />
           <TextBox
-            label="Logo"
-            type="file"
-            InputLabelProps={{ shrink: true }}
-            onChange={handleImageChange}
-            inputRef={logoRef}
-          />
-          <br />
-          <TextBox
             type="text"
             label="Location"
             value={editData.location}
@@ -182,8 +138,6 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
             value={editData.description}
             inputRef={descriptionRef}
           />
-          <br />
-          <Image logo={editData.logo} />
         </Form>
         <br />
         <br />

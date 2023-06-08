@@ -135,11 +135,6 @@ const Cafe = () => {
 
   const openEmployee = useCallback((event) => {
     const { employees, name, location } = event.data;
-    if (employees <= 0) {
-      setShowSnack(true);
-      setSnackMessage("This cafe does not have any employees");
-      return;
-    }
     navigate(`/employee?name=${name}&location=${location}`);
     return;
   }, []);
@@ -152,11 +147,6 @@ const Cafe = () => {
 
   const openEmployeeByLocation = useCallback((event) => {
     const { employees, name, location } = event.data;
-    if (employees <= 0) {
-      setShowSnack(true);
-      setSnackMessage("This cafe does not have any employees");
-      return;
-    }
     navigate(`/employee?location=${location}`);
     return;
   }, []);
