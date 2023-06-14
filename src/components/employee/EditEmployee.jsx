@@ -159,8 +159,8 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
       (name.toLowerCase() !== editData.name.toLowerCase() ||
         email.toLowerCase() !== editData.email_address.toLowerCase() ||
         Number(phoneNumber) !== editData.phone_number ||
-        tempCafeName !== editData.cafe_name ||
-        tempLocation !== editData.location) ||
+        tempCafeName.toLowerCase() !== editData.cafe_name.toLowerCase() ||
+        tempLocation.toLowerCase() !== editData.location.toLowerCase()) ||
       new Date(tempDateStart).getTime() !== new Date(editData.date_start).getTime() ||
       new Date(tempDateEnd).getTime() !== new Date(editData.date_end).getTime()
     ) {
@@ -212,8 +212,8 @@ const EditEmployee = ({ editData, returnToEmployee, action }) => {
       email === editData.email_address &&
       Number(phoneNumber) === editData.phone_number &&
       gender === editData.gender &&
-      tempCafeName === editData.cafe_name &&
-      tempLocation === editData.location &&
+      tempCafeName.toLowerCase() === editData.cafe_name.toLowerCase() &&
+      tempLocation.toLowerCase() === editData.location.toLowerCase() &&
       new Date(tempDateStart).getTime() === new Date(editData.date_start).getTime() &&
       new Date(tempDateEnd).getTime() === new Date(editData.date_end).getTime()
     ) {
