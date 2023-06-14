@@ -63,6 +63,7 @@ const EditCafe = ({ editData, returnToCafe, action }) => {
         updateCafe(cafeObject);
       })
       .catch((err) => {
+        console.log(err);
         if (err.input === "name") {
           nameRef.current.focus();
         }

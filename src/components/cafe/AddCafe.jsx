@@ -40,13 +40,16 @@ const AddCafe = ({ action, returnToCafe }) => {
 
   const CreateCafe = useCallback(
     (formData) => {
+      console.log("FORM", formData);
       CafeService.createCafe(formData)
         .then((res) => {
           returnToCafe(true);
         })
         .catch((err) => {
+          console.log("ere", err);
           setShowSnack(true);
           setSnackMessage(err.response.data);
+          return;
         });
     },
     [returnToCafe]
@@ -64,9 +67,9 @@ const AddCafe = ({ action, returnToCafe }) => {
           formData = new FormData();
         }
 
-        formData.append("name", name);
-        formData.append("description", description);
-        formData.append("location", location);
+        formData.set("name", name);
+        formData.set("description", description);
+        formData.set("location", location);
 
         CreateCafe(formData);
       })
@@ -112,7 +115,7 @@ const AddCafe = ({ action, returnToCafe }) => {
       }
 
       const formData = new FormData();
-      formData.append("image", file);
+      formData.set("image", file);
       setIFormData(formData);
 
       setSelectedImage(URL.createObjectURL(file));
